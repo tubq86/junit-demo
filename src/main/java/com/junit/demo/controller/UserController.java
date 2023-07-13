@@ -1,5 +1,6 @@
 package com.junit.demo.controller;
 
+import com.junit.demo.dto.UserDto;
 import com.junit.demo.entity.User;
 import com.junit.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User addUser(@RequestBody User user){
+    public User addUser(@RequestBody UserDto user){
         return userService.addUser(user);
     }
 
@@ -39,10 +40,9 @@ public class UserController {
 
     @PutMapping("{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") long userId,
-            @RequestBody User user){
+            @RequestBody UserDto user){
         return userService.getUserById(userId)
                 .map(usr -> {
-
                     usr.setName(user.getName());
                     usr.setEmail(user.getEmail());
 
@@ -55,10 +55,9 @@ public class UserController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("id") long userId){
-
         userService.deleteUser(userId);
 
-        return new ResponseEntity<String>("User deleted successfully!.", HttpStatus.OK);
+        return new ResponseEntity<>("User deleted successfully!.", HttpStatus.OK);
 
     }
 }

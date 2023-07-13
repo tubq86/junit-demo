@@ -1,6 +1,7 @@
 package com.junit.demo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.junit.demo.dto.UserDto;
 import com.junit.demo.entity.User;
 import com.junit.demo.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * @since : 7/4/2023, Tue
  */
 @WebMvcTest
-public class UserControllerTests {
+class UserControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
@@ -39,20 +40,27 @@ public class UserControllerTests {
     private ObjectMapper objectMapper;
 
     @Test
-    public void givenUserObject_whenCreateUser_thenReturnSavedUser() throws Exception{
+    void givenUserObject_whenCreateUser_thenReturnSavedUser() throws Exception{
 
         // given - precondition or setup
         User user = User.builder()
                 .name("Nam")
                 .email("namlh@gmail.com")
+                .age(18)
                 .build();
-        given(userService.addUser(any(User.class)))
-                .willAnswer((invocation)-> invocation.getArgument(0));
+
+        UserDto userDto = new UserDto();
+        userDto.setName("Nam");
+        userDto.setEmail("namlh@gmail.com");
+        userDto.setAge(18);
+
+        given(userService.addUser(any(UserDto.class)))
+                .willReturn(user);
 
         // when - action or behaviour that we are going test
         ResultActions response = mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user)));
+                .content(objectMapper.writeValueAsString(userDto)));
 
         // then - verify the result or output using assert statements
         response.andDo(print()).
@@ -66,7 +74,7 @@ public class UserControllerTests {
 
     // JUnit test for Get All users REST API
     @Test
-    public void givenListOfUsers_whenGetAllUsers_thenReturnUsersList() throws Exception{
+    void givenListOfUsers_whenGetAllUsers_thenReturnUsersList() throws Exception{
         // given - precondition or setup
         List<User> listOfUsers = new ArrayList<>();
         listOfUsers.add(User.builder().name("Ramesh").email("namlh@gmail.com").build());
@@ -87,7 +95,7 @@ public class UserControllerTests {
     // positive scenario - valid user id
     // JUnit test for GET user by id REST API
     @Test
-    public void givenUserId_whenGetUserById_thenReturnUserObject() throws Exception{
+    void givenUserId_whenGetUserById_thenReturnUserObject() throws Exception{
         // given - precondition or setup
         long userId = 1L;
         User user = User.builder()
@@ -110,7 +118,7 @@ public class UserControllerTests {
     // negative scenario - valid user id
     // JUnit test for GET user by id REST API
     @Test
-    public void givenInvalidUserId_whenGetUserById_thenReturnEmpty() throws Exception{
+    void givenInvalidUserId_whenGetUserById_thenReturnEmpty() throws Exception{
         // given - precondition or setup
         long userId = 1L;
         User user = User.builder()
@@ -129,7 +137,7 @@ public class UserControllerTests {
     }
     // JUnit test for update user REST API - positive scenario
     @Test
-    public void givenUpdatedUser_whenUpdateUser_thenReturnUpdateUserObject() throws Exception{
+    void givenUpdatedUser_whenUpdateUser_thenReturnUpdateUserObject() throws Exception{
         // given - precondition or setup
         long userId = 1L;
         User savedUser = User.builder()
@@ -160,7 +168,7 @@ public class UserControllerTests {
 
     // JUnit test for update user REST API - negative scenario
     @Test
-    public void givenUpdatedUser_whenUpdateUser_thenReturn404() throws Exception{
+    void givenUpdatedUser_whenUpdateUser_thenReturn404() throws Exception{
         // given - precondition or setup
         long userId = 1L;
         User savedUser = User.builder()
@@ -188,7 +196,7 @@ public class UserControllerTests {
 
     // JUnit test for delete user REST API
     @Test
-    public void givenUserId_whenDeleteUser_thenReturn200() throws Exception{
+    void givenUserId_whenDeleteUser_thenReturn200() throws Exception{
         // given - precondition or setup
         long userId = 1L;
         willDoNothing().given(userService).deleteUser(userId);

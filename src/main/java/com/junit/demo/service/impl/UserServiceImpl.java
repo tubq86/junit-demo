@@ -1,5 +1,6 @@
 package com.junit.demo.service.impl;
 
+import com.junit.demo.dto.UserDto;
 import com.junit.demo.entity.User;
 import com.junit.demo.repository.UserRepository;
 import com.junit.demo.service.UserService;
@@ -21,13 +22,15 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public User addUser(User user) {
+    public User addUser(UserDto user) {
         Optional<User> savedUser = userRepository.findByEmail(user.getEmail());
         if(savedUser.isPresent()){
             throw new ResourceNotFoundException("Employee already exist with given email:" + user.getEmail());
         }
 
-        return userRepository.save(user);
+        User u = User.builder().name(user.getName()).email(user.getEmail()).age(user.getAge()).build();
+
+        return userRepository.save(u);
     }
 
     @Override

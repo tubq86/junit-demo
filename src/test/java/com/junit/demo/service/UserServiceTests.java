@@ -1,33 +1,38 @@
 package com.junit.demo.service;
 
+import com.junit.demo.dto.UserDto;
 import com.junit.demo.entity.User;
 import com.junit.demo.repository.UserRepository;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.junit.demo.service.impl.UserServiceImpl;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
-
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.*;
 
 /**
  * @author : TuBQ
  * @since : 7/3/2023, Mon
  */
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTests {
+@MockitoSettings(strictness = Strictness.LENIENT)
+class UserServiceTests {
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -36,30 +41,45 @@ public class UserServiceTests {
 
     private User user;
 
+    private UserDto userDto;
+
     @BeforeEach
     void init() {
         user = User.builder()
                 .id(1L)
                 .name("Nam")
                 .email("namlh@gmail.com")
+                .age(18)
                 .build();
+
+        userDto = new UserDto();
+        userDto.setName("Nam");
+        userDto.setEmail("namlh@gmail.com");
+        userDto.setAge(18);
     }
 
     // JUnit test for saveUser method
     @DisplayName("JUnit test for saveUser method")
     @Test
-    public void givenUserObject_whenSaveUser_thenReturnUserObject(){
+    void givenUserObject_whenSaveUser_thenReturnUserObject(){
         // given - precondition or setup
         given(userRepository.findByEmail(user.getEmail()))
                 .willReturn(Optional.empty());
 
-        given(userRepository.save(user)).willReturn(user);
+        User.UserBuilder builder = mock(User.UserBuilder.class);
+        given(builder.name(userDto.getName())).willReturn(builder);
+        given(builder.email(userDto.getEmail())).willReturn(builder);
+        given(builder.age(userDto.getAge())).willReturn(builder);
+        when(builder.build()).thenReturn(user);
+
+        given(userRepository.save(any(User.class))).willReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
 
         System.out.println(userRepository);
         System.out.println(userService);
 
         // when -  action or the behaviour that we are going test
-        User savedUser = userService.addUser(user);
+        User savedUser = userService.addUser(userDto);
 
         System.out.println(savedUser);
         // then - verify the output
@@ -69,7 +89,7 @@ public class UserServiceTests {
     // JUnit test for saveUser method
     @DisplayName("JUnit test for saveUser method which throws exception")
     @Test
-    public void givenExistingEmail_whenSaveUser_thenThrowsException(){
+    void givenExistingEmail_whenSaveUser_thenThrowsException(){
         // given - precondition or setup
         given(userRepository.findByEmail(user.getEmail()))
                 .willReturn(Optional.of(user));
@@ -79,7 +99,7 @@ public class UserServiceTests {
 
         // when -  action or the behaviour that we are going test
         org.junit.jupiter.api.Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            userService.addUser(user);
+            userService.addUser(userDto);
         });
 
         // then
@@ -89,7 +109,7 @@ public class UserServiceTests {
     // JUnit test for getAllUsers method
     @DisplayName("JUnit test for getAllUsers method")
     @Test
-    public void givenUsersList_whenGetAllUsers_thenReturnUsersList(){
+    void givenUsersList_whenGetAllUsers_thenReturnUsersList(){
         // given - precondition or setup
 
         User user1 = User.builder()
@@ -111,7 +131,7 @@ public class UserServiceTests {
     // JUnit test for getAllUsers method
     @DisplayName("JUnit test for getAllUsers method (negative scenario)")
     @Test
-    public void givenEmptyUsersList_whenGetAllUsers_thenReturnEmptyUsersList(){
+    void givenEmptyUsersList_whenGetAllUsers_thenReturnEmptyUsersList(){
         // given - precondition or setup
 
         User user1 = User.builder()
@@ -127,13 +147,13 @@ public class UserServiceTests {
 
         // then - verify the output
         assertThat(userList).isEmpty();
-        assertThat(userList.size()).isEqualTo(0);
+        assertThat(userList.size()).isZero();
     }
 
     // JUnit test for getUserById method
     @DisplayName("JUnit test for getUserById method")
     @Test
-    public void givenUserId_whenGetUserById_thenReturnUserObject(){
+    void givenUserId_whenGetUserById_thenReturnUserObject(){
         // given
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
 
@@ -148,7 +168,7 @@ public class UserServiceTests {
     // JUnit test for updateUser method
     @DisplayName("JUnit test for updateUser method")
     @Test
-    public void givenUserObject_whenUpdateUser_thenReturnUpdatedUser(){
+    void givenUserObject_whenUpdateUser_thenReturnUpdatedUser(){
         // given - precondition or setup
         given(userRepository.save(user)).willReturn(user);
         user.setEmail("ram@gmail.com");
@@ -164,7 +184,7 @@ public class UserServiceTests {
     // JUnit test for deleteUser method
     @DisplayName("JUnit test for deleteUser method")
     @Test
-    public void givenUserId_whenDeleteUser_thenNothing(){
+    void givenUserId_whenDeleteUser_thenNothing(){
         // given - precondition or setup
         long userId = 1L;
 
