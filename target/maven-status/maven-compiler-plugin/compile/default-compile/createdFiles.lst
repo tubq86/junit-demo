@@ -1,0 +1,8 @@
+com\junit\demo\controller\UserController.class
+com\junit\demo\entity\User.class
+com\junit\demo\entity\User$UserBuilder.class
+com\junit\demo\service\impl\UserServiceImpl.class
+com\junit\demo\ErrorConstant.class
+com\junit\demo\JunitDemoApplication.class
+com\junit\demo\repository\UserRepository.class
+com\junit\demo\service\UserService.class
