@@ -73,7 +73,6 @@ class UserServiceTests {
         given(builder.email(usrDto.getEmail())).willReturn(builder);
         given(builder.age(usrDto.getAge())).willReturn(builder);
         given(builder.name(usrDto.getName()).email(usrDto.getEmail()).age(usrDto.getAge())).willReturn(builder);
-//        when(builder.build()).thenReturn(user);
         when(builder.name(usrDto.getName()).email(usrDto.getEmail()).age(usrDto.getAge()).build()).thenReturn(user);
 
         given(userRepository.save(any(User.class))).willReturn(user);
